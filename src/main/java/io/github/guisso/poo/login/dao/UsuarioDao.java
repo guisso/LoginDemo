@@ -10,8 +10,6 @@ import io.github.guisso.poo.login.entity.Usuario;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -31,7 +29,7 @@ import java.util.logging.Logger;
  * @author Luis Guisso <luis dot guisso at ifnmg dot edu dot br>
  * @version 0.0.1, 10/08/2021
  */
-public class UsuarioDao extends AbstractDao<Usuario, Long> {
+public class UsuarioDao extends Dao<Usuario> {
 
     /**
      * Recupera a sentença SQL específica para a inserção da entidade no banco
@@ -41,7 +39,7 @@ public class UsuarioDao extends AbstractDao<Usuario, Long> {
      */
     @Override
     public String getDeclaracaoInsert() {
-        return "INSERT INTO usuario (id, nome, email, senha, administrador) VALUES (default, ?, ?, MD5(?), ?);";
+        return "INSERT INTO usuario (id, nome, email, senha, administrador) VALUES (default, ?, ?, MD5(?), ?)";
     }
 
     /**
@@ -52,7 +50,7 @@ public class UsuarioDao extends AbstractDao<Usuario, Long> {
      */
     @Override
     public String getDeclaracaoSelectPorId() {
-        return "SELECT * FROM usuario WHERE id = ?;";
+        return "SELECT * FROM usuario WHERE id = ?";
     }
 
     /**
@@ -74,7 +72,7 @@ public class UsuarioDao extends AbstractDao<Usuario, Long> {
      */
     @Override
     public String getDeclaracaoUpdate() {
-        return "UPDATE usuario SET nome = ?, email = ?, senha = MD5(?), administrador = ? WHERE id = ?;";
+        return "UPDATE usuario SET nome = ?, email = ?, senha = MD5(?), administrador = ? WHERE id = ?";
     }
 
     /**
@@ -85,7 +83,7 @@ public class UsuarioDao extends AbstractDao<Usuario, Long> {
      */
     @Override
     public String getDeclaracaoDelete() {
-        return "DELETE FROM usuario WHERE id = ?;";
+        return "DELETE FROM usuario WHERE id = ?";
     }
 
     /**
@@ -93,23 +91,19 @@ public class UsuarioDao extends AbstractDao<Usuario, Long> {
      * atualização de registros no banco de dados.
      *
      * @param pstmt Declaração previamente preparada.
-     * @param id Chave primária a ser inserida na sentença SQL.
+     * @param usuario Dados do usuário a serem montados na SQL.
      */
     @Override
     public void montarDeclaracao(PreparedStatement pstmt, Usuario usuario) {
         // Tenta definir valores junto à sentença SQL preparada para execução 
         // no banco de dados.
         try {
-            if (usuario.getId() == null || usuario.getId() == 0) {
-                pstmt.setString(1, usuario.getNome());
-                pstmt.setString(2, usuario.getEmail());
-                pstmt.setString(3, usuario.getSenha());
-                pstmt.setBoolean(4, usuario.getAdministrador());
-            } else {
-                pstmt.setString(1, usuario.getNome());
-                pstmt.setString(2, usuario.getEmail());
-                pstmt.setString(3, usuario.getSenha());
-                pstmt.setBoolean(4, usuario.getAdministrador());
+            pstmt.setString(1, usuario.getNome());
+            pstmt.setString(2, usuario.getEmail());
+            pstmt.setString(3, usuario.getSenha());
+            pstmt.setBoolean(4, usuario.getAdministrador());
+
+            if (usuario.getId() != null) {
                 pstmt.setLong(5, usuario.getId());
             }
         } catch (SQLException ex) {
@@ -136,6 +130,7 @@ public class UsuarioDao extends AbstractDao<Usuario, Long> {
             usuario.setEmail(resultSet.getString("email"));
             usuario.setSenha(resultSet.getString("senha"));
             usuario.setAdministrador(resultSet.getBoolean("administrador"));
+            
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -144,49 +139,8 @@ public class UsuarioDao extends AbstractDao<Usuario, Long> {
         return usuario;
     }
 
-    /**
-     * Cria objeto(s) a partir do(s) registro(s) fornecido(s) pelo banco de
-     * dados.
-     *
-     * @param resultSet Resultado(s) proveniente(s) do banco de dados
-     * relacional.
-     * @return Lista de objeto(s) constituído(s).
-     */
-    @Override
-    public List<Usuario> extrairObjetos(ResultSet resultSet) {
-
-        // Cria referência para inserção das tarefas a serem mapeadas
-        ArrayList<Usuario> usuarios = new ArrayList<>();
-
-        // Tenta...
-        try {
-            // ... entquanto houver registros a serem processados
-            while (resultSet.next()) {
-                // Cria referência para montagem da tarefa
-                Usuario usuario = new Usuario();
-
-                // Tenta recuperar dados do registro retornado pelo banco 
-                // de dados e ajustar o estado da tarefa a ser mapeada
-                usuario.setId(resultSet.getLong("id"));
-                usuario.setNome(resultSet.getString("nome"));
-                usuario.setEmail(resultSet.getString("email"));
-                usuario.setSenha(resultSet.getString("senha"));
-                usuario.setAdministrador(resultSet.getBoolean("administrador"));
-
-                // Insere a tarefa na lista de tarefas recuperadas
-                usuarios.add(usuario);
-            }
-        } catch (SQLException ex) {
-            Logger.getLogger(UsuarioDao.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
-        // Devolve a lista de tarefas reconstituídas dos registros do banco 
-        // de dados
-        return usuarios;
-    }
-
     public Usuario autenticar(Usuario usuario) {
-        try (PreparedStatement pstmt
+        try ( PreparedStatement pstmt
                 = ConexaoBd.getConexao().prepareStatement(
                         // Sentença SQL para validação de usuário
                         "SELECT * "

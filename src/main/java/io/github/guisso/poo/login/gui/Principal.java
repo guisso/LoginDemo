@@ -7,6 +7,10 @@
 package io.github.guisso.poo.login.gui;
 
 import io.github.guisso.poo.login.entity.Usuario;
+import java.beans.PropertyVetoException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.JInternalFrame;
 
 /**
  *
@@ -14,22 +18,26 @@ import io.github.guisso.poo.login.entity.Usuario;
  * @version 0.0.1, 09/08/2021
  */
 public class Principal extends javax.swing.JFrame {
-    
+
     private Usuario usuarioSistema;
 
     /**
      * Creates new form Principal
+     * @param usuarioSistema Dados do usuário para personalização da UI
      */
     public Principal(Usuario usuarioSistema) {
         this.usuarioSistema = usuarioSistema;
         initComponents();
-        
+
         // Configuração da janela diante do perfil de administrador
-//        if(usuarioSistema.getAdministrador()) {
-//            System.out.println("admin? " + usuarioSistema.getAdministrador());
-            mnuAdministrador.setEnabled(usuarioSistema.getAdministrador());
-//        }
+//        if(usuarioSistema.getAdministrador()) { ... }
+//        System.out.println("admin? " + usuarioSistema.getAdministrador());
+        mnuAdministrador.setEnabled(usuarioSistema.getAdministrador());
+        mnuCadastroUsuario.setEnabled(usuarioSistema.getAdministrador());
         
+        // Personalização do título da janela
+        setTitle("Sistema :: " + usuarioSistema.getNome());
+
         // Centralização da janela
         setLocationRelativeTo(null);
     }
@@ -101,6 +109,11 @@ public class Principal extends javax.swing.JFrame {
 
         mnuSair.setMnemonic('r');
         mnuSair.setText("Sair");
+        mnuSair.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuSairActionPerformed(evt);
+            }
+        });
         mnuArquivo.add(mnuSair);
 
         mnuBarra.add(mnuArquivo);
@@ -142,9 +155,11 @@ public class Principal extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void mnuCadastroUsuarioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuCadastroUsuarioActionPerformed
-        CadastroUsuario cadastroUsuario = new CadastroUsuario();
-        cadastroUsuario.setVisible(true);
-        dskPrincipal.add(cadastroUsuario);
+//        CadastroUsuario cadastroUsuario = new CadastroUsuario();
+//        cadastroUsuario.setVisible(true);
+//        dskPrincipal.add(cadastroUsuario);
+
+        anexarJanela(CadastroUsuario.getInstance());
     }//GEN-LAST:event_mnuCadastroUsuarioActionPerformed
 
     private void mnuAjudaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuAjudaActionPerformed
@@ -153,6 +168,30 @@ public class Principal extends javax.swing.JFrame {
 //        janelaSobre.setVisible(true);
 //        dskPrincipal.add(janelaSobre);
     }//GEN-LAST:event_mnuAjudaActionPerformed
+
+    private void mnuSairActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuSairActionPerformed
+        new Login().setVisible(true);
+        dispose();
+    }//GEN-LAST:event_mnuSairActionPerformed
+
+    private void anexarJanela(JInternalFrame janela) {
+        if (!janela.isVisible()) {
+            dskPrincipal.add(janela);
+            janela.setVisible(true);
+        }
+
+        try {
+            // Restaura, se minimizada
+            janela.setIcon(false);
+            // Move o foco
+            janela.setSelected(true);
+        } catch (PropertyVetoException ex) {
+            Logger.getLogger(Principal.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        // Traz para o primeiro plano
+        janela.toFront();
+    }
 
     //
     // O método main() não é requerido e nem desejável pois esta janela não 

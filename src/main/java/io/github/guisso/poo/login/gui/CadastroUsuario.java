@@ -15,11 +15,20 @@ import io.github.guisso.poo.login.entity.Usuario;
  */
 public class CadastroUsuario extends javax.swing.JInternalFrame {
 
+    private static CadastroUsuario instance;
+    
     /**
      * Creates new form CadastroUsuario
      */
-    public CadastroUsuario() {
+    private CadastroUsuario() {
         initComponents();
+    }
+    
+    public static CadastroUsuario getInstance() {
+        if(instance == null) {
+            instance = new CadastroUsuario();
+        }
+        return instance;
     }
 
     /**

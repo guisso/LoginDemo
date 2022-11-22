@@ -179,7 +179,7 @@ public abstract class Dao<T> implements IDao<T> {
      * Recupera todos os objetos mapeados para o banco de dados do tipo
      * específico.
      *
-     * @return Lista (geralmente um <code>ArrayList<T></code>) de objetos
+     * @return Lista (geralmente um <code>ArrayList&lt;T&gt;</code>) de objetos
      * persistidos.
      */
     @Override
@@ -257,7 +257,6 @@ public abstract class Dao<T> implements IDao<T> {
      */
     public void ajustarIdDeclaracao(PreparedStatement pstmt, Long id) {
         try {
-            // CasCast é requerido porque K não é um tipo previamente definido
             pstmt.setLong(1, id);
 
         } catch (SQLException ex) {

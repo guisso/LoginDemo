@@ -15,9 +15,8 @@ import java.util.List;
  * @version 0.0.1, 29/11/2020
  * 
  * @param <T> Tipo da entidade a ser processada
- * @param <K> Tipo da chave primária
  */
-public interface IDao<T, K> {
+public interface IDao<T> {
 
     /**
      * Executa o procedimento de salvamento (inserção ou atualização) do objeto
@@ -27,7 +26,7 @@ public interface IDao<T, K> {
      * @return Valor da chave primária gerada pela inclusão de um novo registro
      * ou mesmo valor da chave primária do objeto original presistido anteriormente.
      */
-    public K salvar(T o);
+    public Long salvar(T o);
 
     /**
      * Exclui o registro do objeto no banco de dados.
@@ -45,11 +44,11 @@ public interface IDao<T, K> {
      * @param id Identidade do objeto.
      * @return Objeto segundo registro persistido.
      */
-    public T localizarPorId(K id);
+    public T localizarPorId(Long id);
 
     /**
      * Recupera todos os objetos mapeados para o banco de dados do tipo específico.
-     * @return Lista (geralmente um <code>ArrayList<T></code>) de objetos persistidos.
+     * @return Lista (geralmente um <code>ArrayList&lt;T&gt;</code>) de objetos persistidos.
      */
     public List<T> localizarTodos();
 }
